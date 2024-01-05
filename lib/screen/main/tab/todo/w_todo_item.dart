@@ -4,14 +4,13 @@ import 'package:fast_app_base/common/dart/extension/datetime_extension.dart';
 import 'package:fast_app_base/common/widget/w_rounded_container.dart';
 import 'package:fast_app_base/screen/main/tab/todo/w_todo_status.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import '../../../../data/memory/vo/vo_todo.dart';
 
-class TodoItem extends StatelessWidget {
+class TodoItem extends StatelessWidget with TodoDataProvider{
   final Todo todo;
 
-  const TodoItem(this.todo, {super.key});
+  TodoItem(this.todo, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +43,7 @@ class TodoItem extends StatelessWidget {
         ),
       ),
       onDismissed: (Direction){ //실제로 지우는 것이 필요
-        context.holder.removeTodo(todo);
+        todoData.removeTodo(todo);
       },
       key: ValueKey(todo.id),
       child: RoundedContainer(
@@ -62,7 +61,7 @@ class TodoItem extends StatelessWidget {
               ),
               IconButton( //수정버튼
                 onPressed: () async {
-                  context.holder.editTodo(todo);
+                  todoData.editTodo(todo);
                 },
                 icon: const Icon(EvaIcons.editOutline),
               ),

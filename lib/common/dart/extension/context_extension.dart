@@ -1,6 +1,5 @@
 import 'package:fast_app_base/common/theme/custom_theme.dart';
 import 'package:fast_app_base/common/theme/custom_theme_holder.dart';
-import 'package:fast_app_base/data/memory/vo/todo_data_holder.dart';
 import 'package:flutter/material.dart';
 
 import '../../common.dart';
