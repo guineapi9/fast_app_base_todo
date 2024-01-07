@@ -2,12 +2,13 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:fast_app_base/common/common.dart';
 import 'package:fast_app_base/common/dart/extension/datetime_extension.dart';
 import 'package:fast_app_base/common/widget/w_rounded_container.dart';
+import 'package:fast_app_base/data/memory/bloc/todo_event.dart';
 import 'package:fast_app_base/screen/main/tab/todo/w_todo_status.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../data/memory/vo/vo_todo.dart';
+import '../../../../data/memory/vo_todo.dart';
 
-class TodoItem extends StatelessWidget with TodoDataProvider{
+class TodoItem extends StatelessWidget{
   final Todo todo;
 
   TodoItem(this.todo, {super.key});
@@ -42,8 +43,8 @@ class TodoItem extends StatelessWidget with TodoDataProvider{
           ],
         ),
       ),
-      onDismissed: (Direction){ //실제로 지우는 것이 필요
-        todoData.removeTodo(todo);
+      onDismissed: (direction){ //실제로 지우는 것이 필요
+        context.readTodoBloc.add(TodoRemovedEvent(todo));
       },
       key: ValueKey(todo.id),
       child: RoundedContainer(
@@ -61,7 +62,7 @@ class TodoItem extends StatelessWidget with TodoDataProvider{
               ),
               IconButton( //수정버튼
                 onPressed: () async {
-                  todoData.editTodo(todo);
+                  context.readTodoBloc.add(TodoContentUpdateEvent(todo));
                 },
                 icon: const Icon(EvaIcons.editOutline),
               ),
