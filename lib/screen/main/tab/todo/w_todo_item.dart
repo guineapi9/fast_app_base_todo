@@ -4,17 +4,21 @@ import 'package:fast_app_base/common/dart/extension/datetime_extension.dart';
 import 'package:fast_app_base/common/widget/w_rounded_container.dart';
 import 'package:fast_app_base/screen/main/tab/todo/w_todo_status.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/memory/vo/vo_todo.dart';
 
-class TodoItem extends StatelessWidget with TodoDataProvider{
+class TodoItem extends ConsumerWidget{
   final Todo todo;
 
-  TodoItem(this.todo, {super.key});
+  const TodoItem(this.todo, {super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Dismissible( //Swipe해서 지울 수 있는 기능
+      onDismissed: (direction){ //실제로 지우는 것이 필요
+        ref.readTodoHolder.removeTodo(todo);
+      },
       //지울 때 뒤에 쓰레기통이 나오도록 RoundContainer 생성
       background: RoundedContainer(
         color: context.appColors.removeTodoBg,
@@ -42,9 +46,6 @@ class TodoItem extends StatelessWidget with TodoDataProvider{
           ],
         ),
       ),
-      onDismissed: (Direction){ //실제로 지우는 것이 필요
-        todoData.removeTodo(todo);
-      },
       key: ValueKey(todo.id),
       child: RoundedContainer(
         margin: const EdgeInsets.only(bottom: 6),
@@ -61,7 +62,7 @@ class TodoItem extends StatelessWidget with TodoDataProvider{
               ),
               IconButton( //수정버튼
                 onPressed: () async {
-                  todoData.editTodo(todo);
+                  ref.readTodoHolder.editTodo(todo);
                 },
                 icon: const Icon(EvaIcons.editOutline),
               ),

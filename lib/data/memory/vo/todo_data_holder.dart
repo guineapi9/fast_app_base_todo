@@ -1,13 +1,17 @@
 import 'package:fast_app_base/data/memory/vo/todo_status.dart';
 import 'package:fast_app_base/data/memory/vo/vo_todo.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../screen/dialog/d_confirm.dart';
 import '../../../screen/main/write/d_write_todo.dart';
 
-class TodoDataHolder extends GetxController {
-  final RxList<Todo> todoList = <Todo>[].obs;
+final todoDataProvider = StateNotifierProvider<TodoDataHolder, List<Todo>>(
+    (ref) => TodoDataHolder());
 
+class TodoDataHolder extends StateNotifier<List<Todo>> {
+
+  //비어있는 초기값
+  TodoDataHolder() : super([]);
 
   void changeTodoStatus(Todo todo) async {
     switch (todo.status) {
@@ -19,18 +23,20 @@ class TodoDataHolder extends GetxController {
         final result = await ConfirmDialog("정말로 처음 상태로 변경하시겠어요?").show();
         result?.runIfSuccess((data) => todo.status = TodoStatus.incomplete);
     }
-    todoList.refresh(); // 뷰 갱신
+    state = List.of(state); //Getx의 Refresh와 동일한 효과
   }
 
   void addTodo() async {
     final result = await WriteTodoDialog().show();
     //mounted : 현재 WriteTodoDialog 화면이 살아있는지 체크
     if (result != null) {
-      todoList.add(Todo( //add 기능에는 refresh 기능이 포함되어 있다.
+      state.add(Todo(
+        //add 기능에는 refresh 기능이 포함되어 있다.
         id: DateTime.now().millisecondsSinceEpoch, // 현재 시간값
         title: result.text,
         dueDate: result.dateTime,
       ));
+      state = List.of(state); //Getx의 Refresh와 동일한 효과
     }
   }
 
@@ -39,16 +45,16 @@ class TodoDataHolder extends GetxController {
     if (result != null) {
       todo.title = result.text;
       todo.dueDate = result.dateTime;
-      todoList.refresh();
+      state = List.of(state); //Getx의 Refresh와 동일한 효과
     }
   }
 
   void removeTodo(Todo todo) async {
-    todoList.remove(todo); //삭제
-    todoList.refresh();
+    state.remove(todo); //삭제
+    state = List.of(state); //Getx의 Refresh와 동일한 효과
   }
 }
 
-mixin class TodoDataProvider{
-  late final TodoDataHolder todoData = Get.find();
+extension TodoListHolderProvider on WidgetRef{
+  TodoDataHolder get readTodoHolder => read(todoDataProvider.notifier);
 }
